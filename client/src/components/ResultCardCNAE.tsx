@@ -33,9 +33,14 @@ export function ResultCardCNAE({
             </span>
           </div>
           
-          <p className="text-gray-900 leading-relaxed">
+          <p className="text-gray-900 leading-relaxed mb-2">
             <Highlight text={descricao} query={query} />
           </p>
+          
+          <div className="flex items-center text-xs text-gray-500">
+            <span className="mr-2">👆</span>
+            <span>Clique para ver a hierarquia completa</span>
+          </div>
         </div>
       </div>
     </div>

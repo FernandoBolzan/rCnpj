@@ -161,26 +161,31 @@ function App() {
   const handleSaveCNPJFavorite = () => {
     if (!cnpjResult) return;
     
-    const newFavorite: FavoriteCNPJ = {
-      cnpj: cnpjResult.cnpj,
-      razao_social: cnpjResult.razao_social,
-      nome_fantasia: cnpjResult.nome_fantasia,
-      createdAt: new Date().toISOString()
-    };
-    
     const isAlreadyFavorite = favorites.cnpj.some(f => f.cnpj === cnpjResult.cnpj);
     
     if (isAlreadyFavorite) {
-      toast.error('CNPJ já está nos favoritos');
-      return;
+      // Remove dos favoritos
+      setFavorites(prev => ({
+        ...prev,
+        cnpj: prev.cnpj.filter(f => f.cnpj !== cnpjResult.cnpj)
+      }));
+      toast.success('CNPJ removido dos favoritos!');
+    } else {
+      // Adiciona aos favoritos
+      const newFavorite: FavoriteCNPJ = {
+        cnpj: cnpjResult.cnpj,
+        razao_social: cnpjResult.razao_social,
+        nome_fantasia: cnpjResult.nome_fantasia,
+        createdAt: new Date().toISOString()
+      };
+      
+      setFavorites(prev => ({
+        ...prev,
+        cnpj: [newFavorite, ...prev.cnpj]
+      }));
+      
+      toast.success('CNPJ salvo nos favoritos!');
     }
-    
-    setFavorites(prev => ({
-      ...prev,
-      cnpj: [newFavorite, ...prev.cnpj]
-    }));
-    
-    toast.success('CNPJ salvo nos favoritos!');
   };
 
   const handleSaveCNAEFavorite = (id: string, tipo: 'classe' | 'subclasse', descricao: string) => {
@@ -319,36 +324,34 @@ function App() {
                 isLoading={isLoading}
               />
               
-              {cnpjResult && (
-                <ResultCardCNPJ
-                  empresa={cnpjResult}
-                  onSaveFavorite={handleSaveCNPJFavorite}
-                  onViewCNAE={(code) => {
-                    setActiveTab('cnae');
-                    // TODO: Implement CNAE detail view
-                  }}
-                  isFavorite={favorites.cnpj.some(f => f.cnpj === cnpjResult.cnpj)}
-                />
-              )}
+                             {cnpjResult && (
+                 <ResultCardCNPJ
+                   empresa={cnpjResult}
+                   onSaveFavorite={handleSaveCNPJFavorite}
+                   isFavorite={favorites.cnpj.some(f => f.cnpj === cnpjResult.cnpj)}
+                 />
+               )}
             </div>
           )}
           
-          {activeTab === 'cnae' && (
-            <SearchCNAE
-              classes={classes}
-              subclasses={subclasses}
-              onSearch={handleCNAESearch}
-              onSelectClasse={(id) => {
-                // Função mantida para compatibilidade, mas não é mais usada
-                toast.success(`Classe selecionada: ${id}`);
-              }}
-              onSelectSubclasse={(id) => {
-                // Função mantida para compatibilidade, mas não é mais usada
-                toast.success(`Subclasse selecionada: ${id}`);
-              }}
-              isLoading={isLoading}
-            />
-          )}
+                     {activeTab === 'cnae' && (
+             <SearchCNAE
+               classes={classes}
+               subclasses={subclasses}
+               onSearch={handleCNAESearch}
+               onSelectClasse={(id) => {
+                 // Função mantida para compatibilidade, mas não é mais usada
+                 toast.success(`Classe selecionada: ${id}`);
+               }}
+               onSelectSubclasse={(id) => {
+                 // Função mantida para compatibilidade, mas não é mais usada
+                 toast.success(`Subclasse selecionada: ${id}`);
+               }}
+               isLoading={isLoading}
+               onSaveCNAEFavorite={handleSaveCNAEFavorite}
+               favorites={favorites.cnae}
+             />
+           )}
         </div>
       </div>
       

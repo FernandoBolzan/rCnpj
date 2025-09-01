@@ -13,6 +13,8 @@ interface SearchCNAEProps {
   onSelectClasse: (id: string) => void;
   onSelectSubclasse: (id: string) => void;
   isLoading: boolean;
+  onSaveCNAEFavorite?: (id: string, tipo: 'classe' | 'subclasse', descricao: string) => void;
+  favorites?: { id: string; tipo: string }[];
 }
 
 export function SearchCNAE({
@@ -21,7 +23,9 @@ export function SearchCNAE({
   onSearch,
   onSelectClasse,
   onSelectSubclasse,
-  isLoading
+  isLoading,
+  onSaveCNAEFavorite,
+  favorites = []
 }: SearchCNAEProps) {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('subclasses');
@@ -107,31 +111,54 @@ export function SearchCNAE({
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="space-y-6">
-        <div>
-          <label htmlFor="cnae" className="block text-sm font-medium text-gray-700 mb-2">
-            Buscar CNAE
-          </label>
-          <input
-            id="cnae"
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            placeholder="Digite código ou descrição..."
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            disabled={isLoading}
-          />
-        </div>
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-4">
+          Consulta CNAE
+        </h1>
+        <p className="text-gray-600 text-lg">
+          Encontre códigos e descrições de atividades econômicas
+        </p>
+      </div>
 
-        {query.trim() && (
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 mb-8">
+        <div className="space-y-6">
           <div>
-            <Tabs
-              tabs={tabs}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-            
-            <div className="mt-4 space-y-3">
+            <label htmlFor="cnae" className="block text-lg font-semibold text-gray-900 mb-3">
+              Buscar CNAE
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                id="cnae"
+                type="text"
+                value={query}
+                onChange={handleInputChange}
+                placeholder="Digite código ou descrição..."
+                className="w-full pl-12 pr-4 py-4 text-lg rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200"
+                disabled={isLoading}
+              />
+            </div>
+            <p className="mt-3 text-sm text-gray-500">
+              💡 Dica: Digite números para buscar por código ou texto para buscar por descrição
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {query.trim() && (
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
+          <Tabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+          
+          <div className="mt-6 space-y-4">
               {activeTab === 'subclasses' && (
                 <div>
                   {filteredSubclasses.length === 0 ? (
@@ -204,6 +231,14 @@ export function SearchCNAE({
           classe={selectedClasse || undefined}
           subclasse={selectedSubclasse || undefined}
           onClose={() => setShowHierarchy(false)}
+          onSaveFavorite={onSaveCNAEFavorite}
+          isFavorite={
+            selectedClasse 
+              ? favorites.some(f => f.id === selectedClasse.id && f.tipo === 'classe')
+              : selectedSubclasse 
+                ? favorites.some(f => f.id === selectedSubclasse.id && f.tipo === 'subclasse')
+                : false
+          }
         />
       )}
     </div>
