@@ -89,7 +89,19 @@ class API {
   }
 
   async getCNPJ(cnpj: string): Promise<CNPJResponse | null> {
+    // Verificar se cnpj é válido
+    if (!cnpj || typeof cnpj !== 'string') {
+      console.error('CNPJ inválido:', cnpj);
+      return null;
+    }
+    
     const cleanCNPJ = cnpj.replace(/\D/g, '');
+    
+    // Verificar se o CNPJ limpo tem 14 dígitos
+    if (cleanCNPJ.length !== 14) {
+      console.error('CNPJ deve ter 14 dígitos:', cleanCNPJ);
+      return null;
+    }
     
     // Tentar BrasilAPI primeiro
     const result = await this.requestBrasilAPI<any>(`/api/cnpj/v1/${cleanCNPJ}`);
