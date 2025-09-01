@@ -11,7 +11,7 @@ class API {
       const response = await fetch(`${this.baseURL}${endpoint}`);
       
       if (!response.ok) {
-        if (response.status === 502) {
+        if (response.status === 502 || response.status === 404) {
           this.isOffline = true;
           return null;
         }
