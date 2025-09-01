@@ -5,13 +5,31 @@ import { mockClasses, mockSubclasses } from '../mock/cnae';
 class API {
   private baseURL = '/api';
   private isOffline = false;
+  private retryCount = 0;
+  private maxRetries = 3;
 
   private async request<T>(endpoint: string): Promise<T | null> {
     try {
-      const response = await fetch(`${this.baseURL}${endpoint}`);
+      // Verificar conectividade primeiro
+      if (!navigator.onLine) {
+        this.isOffline = true;
+        return null;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
-        if (response.status === 502 || response.status === 404) {
+        if (response.status === 502 || response.status === 404 || response.status === 503) {
           this.isOffline = true;
           return null;
         }
@@ -19,9 +37,20 @@ class API {
       }
       
       this.isOffline = false;
+      this.retryCount = 0;
       return await response.json();
     } catch (error) {
       console.error('Erro na API:', error);
+      
+      // Se for timeout ou erro de rede, tentar novamente
+      const errorObj = error as Error;
+      if (this.retryCount < this.maxRetries && (errorObj.name === 'AbortError' || errorObj.message.includes('fetch'))) {
+        this.retryCount++;
+        console.log(`Tentativa ${this.retryCount} de ${this.maxRetries}`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * this.retryCount)); // Backoff exponencial
+        return this.request<T>(endpoint);
+      }
+      
       this.isOffline = true;
       return null;
     }

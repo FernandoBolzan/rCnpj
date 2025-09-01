@@ -38,7 +38,25 @@ class CNPJService {
         municipio: response.data.municipio,
         uf: response.data.uf,
         cep: response.data.cep,
-        ddd_telefone_1: response.data.ddd_telefone_1
+        ddd_telefone_1: response.data.ddd_telefone_1,
+        // Novos campos da BrasilAPI
+        tipo: response.data.tipo,
+        porte: response.data.porte,
+        capital_social: response.data.capital_social,
+        natureza_juridica: response.data.natureza_juridica,
+        motivo_situacao_cadastral: response.data.motivo_situacao_cadastral,
+        data_situacao_cadastral: response.data.data_situacao_cadastral,
+        data_situacao_especial: response.data.data_situacao_especial,
+        situacao_especial: response.data.situacao_especial,
+        email: response.data.email,
+        telefone: response.data.telefone,
+        efr: response.data.efr,
+        pais_origem: response.data.pais_origem,
+        inscricao_municipal: response.data.inscricao_municipal,
+        inscricao_estadual: response.data.inscricao_estadual,
+        quadro_socios: response.data.quadro_socios || [],
+        quadro_administradores: response.data.quadro_administradores || [],
+        simples_nacional: response.data.simples_nacional
       };
     } catch (error) {
       console.log('BrasilAPI falhou:', error);

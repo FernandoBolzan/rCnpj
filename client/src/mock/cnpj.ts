@@ -18,7 +18,35 @@ export const mockEmpresas: Record<string, CNPJResponse> = {
     municipio: "São Paulo",
     uf: "SP",
     cep: "01000-000",
-    ddd_telefone_1: "(11) 3333-3333"
+    ddd_telefone_1: "(11) 3333-3333",
+    simples_nacional: {
+      optante: true,
+      data_opcao: "2010-06-01"
+    },
+    tipo: "MATRIZ",
+    porte: "GRANDE PORTE",
+    capital_social: "1000000.00",
+    natureza_juridica: "206-2 - Sociedade Empresária Limitada",
+    email: "contato@mockexemplo.com.br",
+    telefone: "(11) 3333-3333",
+    inscricao_municipal: "123456",
+    inscricao_estadual: "123456789",
+    quadro_socios: [
+      {
+        nome: "João Silva",
+        qualificacao: "Sócio-Administrador",
+        data_entrada: "2010-05-10",
+        representante_legal: true,
+        capital_social: "500000.00"
+      },
+      {
+        nome: "Maria Santos",
+        qualificacao: "Sócio",
+        data_entrada: "2010-05-10",
+        representante_legal: false,
+        capital_social: "500000.00"
+      }
+    ]
   },
   "11111111111111": {
     cnpj: "11.111.111/1111-11",
@@ -38,7 +66,34 @@ export const mockEmpresas: Record<string, CNPJResponse> = {
     municipio: "Rio de Janeiro",
     uf: "RJ",
     cep: "20000-000",
-    ddd_telefone_1: "(21) 4444-4444"
+    ddd_telefone_1: "(21) 4444-4444",
+    simples_nacional: {
+      optante: false
+    },
+    tipo: "MATRIZ",
+    porte: "MEDIO PORTE",
+    capital_social: "500000.00",
+    natureza_juridica: "206-2 - Sociedade Empresária Limitada",
+    email: "contato@utimovel.com.br",
+    telefone: "(21) 4444-4444",
+    inscricao_municipal: "654321",
+    inscricao_estadual: "987654321",
+    quadro_socios: [
+      {
+        nome: "Dr. Carlos Oliveira",
+        qualificacao: "Sócio-Administrador",
+        data_entrada: "2015-03-20",
+        representante_legal: true,
+        capital_social: "300000.00"
+      },
+      {
+        nome: "Dra. Ana Costa",
+        qualificacao: "Sócio",
+        data_entrada: "2015-03-20",
+        representante_legal: false,
+        capital_social: "200000.00"
+      }
+    ]
   },
   "22222222222222": {
     cnpj: "22.222.222/2222-22",
@@ -58,6 +113,34 @@ export const mockEmpresas: Record<string, CNPJResponse> = {
     municipio: "Belo Horizonte",
     uf: "MG",
     cep: "30000-000",
-    ddd_telefone_1: "(31) 5555-5555"
+    ddd_telefone_1: "(31) 5555-5555",
+    simples_nacional: {
+      optante: true,
+      data_opcao: "2008-12-01"
+    },
+    tipo: "MATRIZ",
+    porte: "GRANDE PORTE",
+    capital_social: "2000000.00",
+    natureza_juridica: "206-2 - Sociedade Empresária Limitada",
+    email: "contato@supermercado.com.br",
+    telefone: "(31) 5555-5555",
+    inscricao_municipal: "789123",
+    inscricao_estadual: "456789123",
+    quadro_socios: [
+      {
+        nome: "Pedro Ferreira",
+        qualificacao: "Sócio-Administrador",
+        data_entrada: "2008-11-15",
+        representante_legal: true,
+        capital_social: "1200000.00"
+      },
+      {
+        nome: "Lucia Mendes",
+        qualificacao: "Sócio",
+        data_entrada: "2008-11-15",
+        representante_legal: false,
+        capital_social: "800000.00"
+      }
+    ]
   }
 };

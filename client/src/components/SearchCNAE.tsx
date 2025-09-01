@@ -146,7 +146,6 @@ export function SearchCNAE({
               💡 Dica: Digite números para buscar por código ou texto para buscar por descrição
             </p>
           </div>
-
         </div>
       </div>
 
@@ -159,72 +158,71 @@ export function SearchCNAE({
           />
           
           <div className="mt-6 space-y-4">
-              {activeTab === 'subclasses' && (
-                <div>
-                  {filteredSubclasses.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">Nenhuma subclasse encontrada</p>
-                  ) : (
-                    <div className="grid gap-3">
-                      {filteredSubclasses.map((subclasse) => (
-                        <ResultCardCNAE
-                          key={subclasse.id}
-                          id={subclasse.id}
-                          descricao={subclasse.descricao}
-                          tipo="subclasse"
-                          query={query}
-                          onSelect={async () => {
-                            // Primeiro tentar encontrar na lista de classes já carregadas
-                            let classe = classes.find(c => c.id === subclasse.classe.id) || undefined;
-                            
-                            // Se não encontrar, carregar a classe individualmente
-                            if (!classe) {
-                              try {
-                                const api = (await import('../lib/api')).api;
-                                const classeResult = await api.getClasse(subclasse.classe.id);
-                                classe = classeResult || undefined;
-                              } catch (error) {
-                                console.error('Erro ao carregar classe:', error);
-                              }
+            {activeTab === 'subclasses' && (
+              <div>
+                {filteredSubclasses.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Nenhuma subclasse encontrada</p>
+                ) : (
+                  <div className="grid gap-3">
+                    {filteredSubclasses.map((subclasse) => (
+                      <ResultCardCNAE
+                        key={subclasse.id}
+                        id={subclasse.id}
+                        descricao={subclasse.descricao}
+                        tipo="subclasse"
+                        query={query}
+                        onSelect={async () => {
+                          // Primeiro tentar encontrar na lista de classes já carregadas
+                          let classe = classes.find(c => c.id === subclasse.classe.id) || undefined;
+                          
+                          // Se não encontrar, carregar a classe individualmente
+                          if (!classe) {
+                            try {
+                              const api = (await import('../lib/api')).api;
+                              const classeResult = await api.getClasse(subclasse.classe.id);
+                              classe = classeResult || undefined;
+                            } catch (error) {
+                              console.error('Erro ao carregar classe:', error);
                             }
-                            
-                            if (classe) {
-                              handleShowHierarchy(classe, subclasse);
-                            } else {
-                              // Se não conseguir carregar a classe, mostrar apenas a subclasse
-                              handleShowHierarchy(undefined, subclasse);
-                            }
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {activeTab === 'classes' && (
-                <div>
-                  {filteredClasses.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">Nenhuma classe encontrada</p>
-                  ) : (
-                    <div className="grid gap-3">
-                      {filteredClasses.map((classe) => (
-                        <ResultCardCNAE
-                          key={classe.id}
-                          id={classe.id}
-                          descricao={classe.descricao}
-                          tipo="classe"
-                          query={query}
-                          onSelect={() => handleShowHierarchy(classe, undefined)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                          }
+                          
+                          if (classe) {
+                            handleShowHierarchy(classe, subclasse);
+                          } else {
+                            // Se não conseguir carregar a classe, mostrar apenas a subclasse
+                            handleShowHierarchy(undefined, subclasse);
+                          }
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {activeTab === 'classes' && (
+              <div>
+                {filteredClasses.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Nenhuma classe encontrada</p>
+                ) : (
+                  <div className="grid gap-3">
+                    {filteredClasses.map((classe) => (
+                      <ResultCardCNAE
+                        key={classe.id}
+                        id={classe.id}
+                        descricao={classe.descricao}
+                        tipo="classe"
+                        query={query}
+                        onSelect={() => handleShowHierarchy(classe, undefined)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
       
       {showHierarchy && (
         <CNAEHierarchy

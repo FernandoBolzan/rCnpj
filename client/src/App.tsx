@@ -76,14 +76,36 @@ function App() {
     }
   }, []);
 
-  // Check offline status periodically
+  // Check offline status periodically and on network changes
   useEffect(() => {
     const checkOfflineStatus = () => {
       setIsOffline(api.getOfflineStatus());
     };
     
-    const interval = setInterval(checkOfflineStatus, 5000);
-    return () => clearInterval(interval);
+    // Verificar status inicial
+    checkOfflineStatus();
+    
+    // Verificar quando a conexão muda
+    const handleOnline = () => {
+      setIsOffline(false);
+      toast.success('Conexão restaurada!');
+    };
+    
+    const handleOffline = () => {
+      setIsOffline(true);
+      toast.error('Conexão perdida - usando dados locais');
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    const interval = setInterval(checkOfflineStatus, 10000); // Verificar a cada 10s
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Save favorites to localStorage
