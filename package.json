@@ -1,0 +1,22 @@
+{
+  "name": "rcnpj",
+  "version": "1.0.0",
+  "description": "Sistema de consulta CNPJ e CNAE com cache e modo offline",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "test": "cd client && npm run test",
+    "test:run": "cd client && npm run test:run",
+    "lint": "concurrently \"cd server && npm run lint\" \"cd client && npm run lint\"",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": ["cnpj", "cnae", "brasil", "api"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
