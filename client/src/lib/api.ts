@@ -3,12 +3,11 @@ import { mockEmpresas } from '../mock/cnpj';
 import { mockClasses, mockSubclasses } from '../mock/cnae';
 
 class API {
-  private baseURL = '/api';
   private isOffline = false;
   private retryCount = 0;
   private maxRetries = 3;
 
-  private async request<T>(endpoint: string): Promise<T | null> {
+  private async requestBrasilAPI<T>(endpoint: string): Promise<T | null> {
     try {
       // Verificar conectividade primeiro
       if (!navigator.onLine) {
@@ -19,7 +18,7 @@ class API {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+      const response = await fetch(`https://brasilapi.com.br${endpoint}`, {
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +39,7 @@ class API {
       this.retryCount = 0;
       return await response.json();
     } catch (error) {
-      console.error('Erro na API:', error);
+      console.error('Erro na BrasilAPI:', error);
       
       // Se for timeout ou erro de rede, tentar novamente
       const errorObj = error as Error;
@@ -48,7 +47,7 @@ class API {
         this.retryCount++;
         console.log(`Tentativa ${this.retryCount} de ${this.maxRetries}`);
         await new Promise(resolve => setTimeout(resolve, 1000 * this.retryCount)); // Backoff exponencial
-        return this.request<T>(endpoint);
+        return this.requestBrasilAPI<T>(endpoint);
       }
       
       this.isOffline = true;
@@ -56,64 +55,153 @@ class API {
     }
   }
 
+  private async requestIBGE<T>(endpoint: string): Promise<T | null> {
+    try {
+      if (!navigator.onLine) {
+        this.isOffline = true;
+        return null;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(`https://servicodados.ibge.gov.br${endpoint}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        this.isOffline = true;
+        return null;
+      }
+      
+      this.isOffline = false;
+      return await response.json();
+    } catch (error) {
+      console.error('Erro na IBGE API:', error);
+      this.isOffline = true;
+      return null;
+    }
+  }
+
   async getCNPJ(cnpj: string): Promise<CNPJResponse | null> {
-    const result = await this.request<CNPJResponse>(`/cnpj/${cnpj}`);
+    const cleanCNPJ = cnpj.replace(/\D/g, '');
     
-    if (!result) {
-      // Fallback para mock
-      const cleanCNPJ = cnpj.replace(/\D/g, '');
-      return mockEmpresas[cleanCNPJ] || null;
+    // Tentar BrasilAPI primeiro
+    const result = await this.requestBrasilAPI<any>(`/api/cnpj/v1/${cleanCNPJ}`);
+    
+    if (result) {
+      // Mapear resposta da BrasilAPI para nosso formato
+      return {
+        cnpj: result.cnpj,
+        razao_social: result.razao_social,
+        nome_fantasia: result.nome_fantasia,
+        descricao_situacao_cadastral: result.descricao_situacao_cadastral,
+        data_inicio_atividade: result.data_inicio_atividade,
+        cnae_fiscal: result.cnae_fiscal,
+        cnae_fiscal_descricao: result.cnae_fiscal_descricao,
+        cnaes_secundarios: result.cnaes_secundarios || [],
+        logradouro: result.logradouro,
+        numero: result.numero,
+        bairro: result.bairro,
+        municipio: result.municipio,
+        uf: result.uf,
+        cep: result.cep,
+        ddd_telefone_1: result.ddd_telefone_1,
+        tipo: result.tipo,
+        porte: result.porte,
+        capital_social: result.capital_social,
+        natureza_juridica: result.natureza_juridica,
+        email: result.email,
+        telefone: result.telefone,
+        inscricao_municipal: result.inscricao_municipal,
+        inscricao_estadual: result.inscricao_estadual,
+        quadro_socios: result.quadro_socios || [],
+        quadro_administradores: result.quadro_administradores || [],
+        simples_nacional: result.simples_nacional
+      };
     }
     
-    return result;
+    // Fallback para mock
+    return mockEmpresas[cleanCNPJ] || null;
   }
 
   async getClasse(id: string): Promise<CNAEClasse | null> {
-    const result = await this.request<CNAEClasse>(`/cnae/classes/${id}`);
+    // Para CNAE, usar IBGE API
+    const result = await this.requestIBGE<any>(`/api/v2/cnae/classes/${id}`);
     
-    if (!result) {
-      // Fallback para mock
-      return mockClasses.find(c => c.id === id) || null;
+    if (result) {
+      return {
+        id: result.id,
+        descricao: result.descricao,
+        secao: result.secao,
+        divisao: result.divisao,
+        grupo: result.grupo
+      };
     }
     
-    return result;
+    // Fallback para mock
+    return mockClasses.find(c => c.id === id) || null;
   }
 
   async getSubclasse(id: string): Promise<CNAESubclasse | null> {
-    const result = await this.request<CNAESubclasse>(`/cnae/subclasses/${id}`);
+    // Para CNAE, usar IBGE API
+    const result = await this.requestIBGE<any>(`/api/v2/cnae/subclasses/${id}`);
     
-    if (!result) {
-      // Fallback para mock
-      return mockSubclasses.find(s => s.id === id) || null;
+    if (result) {
+      return {
+        id: result.id,
+        descricao: result.descricao,
+        classe: result.classe
+      };
     }
     
-    return result;
+    // Fallback para mock
+    return mockSubclasses.find(s => s.id === id) || null;
   }
 
   async getClasses(): Promise<CNAEClasse[]> {
-    const result = await this.request<CNAEClasse[]>('/cnae/classes');
+    // Para CNAE, usar IBGE API
+    const result = await this.requestIBGE<any[]>('/api/v2/cnae/classes');
     
-    if (!result) {
-      // Fallback para mock
-      return mockClasses;
+    if (result && result.length > 0) {
+      return result.map(item => ({
+        id: item.id,
+        descricao: item.descricao,
+        secao: item.secao,
+        divisao: item.divisao,
+        grupo: item.grupo
+      }));
     }
     
-    return result;
+    // Fallback para mock
+    return mockClasses;
   }
 
   async getSubclasses(): Promise<CNAESubclasse[]> {
-    const result = await this.request<CNAESubclasse[]>('/cnae/subclasses');
+    // Para CNAE, usar IBGE API
+    const result = await this.requestIBGE<any[]>('/api/v2/cnae/subclasses');
     
-    if (!result) {
-      // Fallback para mock
-      return mockSubclasses;
+    if (result && result.length > 0) {
+      return result.map(item => ({
+        id: item.id,
+        descricao: item.descricao,
+        classe: item.classe
+      }));
     }
     
-    return result;
+    // Fallback para mock
+    return mockSubclasses;
   }
 
   async clearCache(): Promise<void> {
-    await this.request('/cache/clear');
+    // Não há cache no cliente, apenas resetar estado
+    this.isOffline = false;
+    this.retryCount = 0;
   }
 
   getOfflineStatus(): boolean {
