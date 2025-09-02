@@ -6,19 +6,13 @@ interface ToolbarProps {
   favoritesCount: number;
   onShowFavorites: () => void;
   onShowHistory: () => void;
-  onClearCache: () => void;
-  onExport: () => void;
-  onImport: () => void;
 }
 
 export function Toolbar({
   isOffline,
   favoritesCount,
   onShowFavorites,
-  onShowHistory,
-  onClearCache,
-  onExport,
-  onImport
+  onShowHistory
 }: ToolbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -68,27 +62,6 @@ export function Toolbar({
           >
             Histórico
           </button>
-          
-          <button
-            onClick={onClearCache}
-            className="rounded-xl px-3 py-2 border border-gray-300 hover:bg-gray-50 active:scale-[0.98] transition text-sm font-medium"
-          >
-            Limpar Cache
-          </button>
-          
-          <button
-            onClick={onExport}
-            className="rounded-xl px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition text-sm font-medium"
-          >
-            Exportar
-          </button>
-          
-          <button
-            onClick={onImport}
-            className="rounded-xl px-3 py-2 bg-green-600 text-white hover:bg-green-700 active:scale-[0.98] transition text-sm font-medium"
-          >
-            Importar
-          </button>
         </div>
 
         {/* Botões Mobile - Favoritos sempre visível */}
@@ -128,30 +101,6 @@ export function Toolbar({
               >
                 <span className="text-lg">📋</span>
                 <span>Histórico</span>
-              </button>
-              
-              <button
-                onClick={() => { onClearCache(); closeMenu(); }}
-                className="w-full rounded-xl px-4 py-3 border border-gray-300 hover:bg-gray-50 active:scale-[0.98] transition text-sm font-medium text-left flex items-center space-x-3"
-              >
-                <span className="text-lg">🗑️</span>
-                <span>Limpar Cache</span>
-              </button>
-              
-              <button
-                onClick={() => { onExport(); closeMenu(); }}
-                className="w-full rounded-xl px-4 py-3 bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition text-sm font-medium text-left flex items-center space-x-3"
-              >
-                <span className="text-lg">📤</span>
-                <span>Exportar</span>
-              </button>
-              
-              <button
-                onClick={() => { onImport(); closeMenu(); }}
-                className="w-full rounded-xl px-4 py-3 bg-green-600 text-white hover:bg-green-700 active:scale-[0.98] transition text-sm font-medium text-left flex items-center space-x-3"
-              >
-                <span className="text-lg">📥</span>
-                <span>Importar</span>
               </button>
             </div>
           </div>

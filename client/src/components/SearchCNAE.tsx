@@ -15,6 +15,7 @@ interface SearchCNAEProps {
   isLoading: boolean;
   onSaveCNAEFavorite?: (id: string, tipo: 'classe' | 'subclasse', descricao: string) => void;
   favorites?: { id: string; tipo: string }[];
+  onCNAESelect?: (cnaeId: string, tipo: 'classe' | 'subclasse', descricao: string) => void;
 }
 
 export function SearchCNAE({
@@ -25,7 +26,8 @@ export function SearchCNAE({
   onSelectSubclasse,
   isLoading,
   onSaveCNAEFavorite,
-  favorites = []
+  favorites = [],
+  onCNAESelect
 }: SearchCNAEProps) {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('subclasses');
@@ -102,6 +104,15 @@ export function SearchCNAE({
     setSelectedClasse(classe);
     setSelectedSubclasse(subclasse);
     setShowHierarchy(true);
+    
+    // Chamar onCNAESelect se fornecido
+    if (onCNAESelect) {
+      if (subclasse) {
+        onCNAESelect(subclasse.id, 'subclasse', subclasse.descricao);
+      } else if (classe) {
+        onCNAESelect(classe.id, 'classe', classe.descricao);
+      }
+    }
   };
 
   const tabs = [

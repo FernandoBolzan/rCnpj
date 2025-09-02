@@ -22,7 +22,7 @@ export interface CNPJResponse {
     data_opcao?: string;
     data_exclusao?: string;
   };
-  // Novos campos da BrasilAPI
+  // Campos da API Invertexto
   tipo?: string;
   porte?: string;
   capital_social?: string;
@@ -37,6 +37,22 @@ export interface CNPJResponse {
   pais_origem?: string;
   inscricao_municipal?: string;
   inscricao_estadual?: string;
+  // Novos campos específicos da Invertexto
+  cnae_principal?: string;
+  cnae_principal_descricao?: string;
+  situacao_cadastral?: string;
+  motivo_situacao?: string;
+  data_situacao?: string;
+  pais_origem_empresa?: string;
+  inscricao_municipal_empresa?: string;
+  inscricao_estadual_empresa?: string;
+  // Campos adicionais da BrasilAPI
+  complemento?: string;
+  codigo_municipio?: number;
+  codigo_natureza_juridica?: number;
+  pais?: string;
+  data_opcao_pelo_simples?: string;
+  data_exclusao_simples?: string;
   quadro_socios?: Array<{
     nome: string;
     qualificacao: string;

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Toolbar } from './components/Toolbar';
 import { Tabs } from './components/Tabs';
 import { SearchCNPJ } from './components/SearchCNPJ';
 import { SearchCNAE } from './components/SearchCNAE';
 import { ResultCardCNPJ } from './components/ResultCardCNPJ';
+import { CNAEList } from './components/CNAEList';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { HistoryDrawer } from './components/HistoryDrawer';
+import { SEO } from './components/SEO';
 import { api } from './lib/api';
 import { storage } from './lib/storage';
 import { 
@@ -28,6 +31,8 @@ const STORAGE_KEYS = {
 };
 
 function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('cnpj');
   const [isOffline, setIsOffline] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,8 +71,6 @@ function App() {
     const cachedClasses = storage.get<CNAEClasse[]>(STORAGE_KEYS.CACHE_CLASSES, []);
     const cachedSubclasses = storage.get<CNAESubclasse[]>(STORAGE_KEYS.CACHE_SUBCLASSES, []);
     
-
-    
     if (cachedClasses.length > 0) {
       setClasses(cachedClasses);
     }
@@ -75,6 +78,33 @@ function App() {
       setSubclasses(cachedSubclasses);
     }
   }, []);
+
+  // Load CNPJ from URL on mount and URL changes
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    if (pathSegments[1] === 'cnpj' && pathSegments[2]) {
+      const cnpjFromUrl = pathSegments[2];
+      if (cnpjFromUrl.length === 14) {
+        // Verificar se já temos o resultado para este CNPJ
+        if (!cnpjResult || cnpjResult.cnpj.replace(/\D/g, '') !== cnpjFromUrl) {
+          setActiveTab('cnpj');
+          handleCNPJSearch(cnpjFromUrl, false); // Não mostrar toast quando carregado da URL
+        }
+      }
+    }
+  }, [location.pathname, cnpjResult]);
+
+  // Load CNAE from URL on mount and URL changes
+  useEffect(() => {
+    const pathSegments = location.pathname.split('/');
+    if (pathSegments[1] === 'cnae' && pathSegments[2]) {
+      const cnaeFromUrl = pathSegments[2];
+      if (cnaeFromUrl.length >= 2) {
+        setActiveTab('cnae');
+        handleCNAESearch(cnaeFromUrl);
+      }
+    }
+  }, [location.pathname]);
 
   // Check offline status periodically and on network changes
   useEffect(() => {
@@ -135,7 +165,7 @@ function App() {
     }));
   };
 
-  const handleCNPJSearch = async (cnpj: string) => {
+  const handleCNPJSearch = async (cnpj: string, showToast: boolean = true) => {
     setIsLoading(true);
     try {
       const result = await api.getCNPJ(cnpj);
@@ -143,12 +173,21 @@ function App() {
       
       if (result) {
         addToHistory('cnpj', cnpj);
-        toast.success('CNPJ consultado com sucesso!');
+        // Navegar para URL amigável
+        const cleanCNPJ = cnpj.replace(/\D/g, '');
+        navigate(`/cnpj/${cleanCNPJ}`);
+        if (showToast) {
+          toast.success('CNPJ consultado com sucesso!');
+        }
       } else {
-        toast.error('CNPJ não encontrado');
+        if (showToast) {
+          toast.error('CNPJ não encontrado');
+        }
       }
     } catch (error) {
-      toast.error('Erro ao consultar CNPJ');
+      if (showToast) {
+        toast.error('Erro ao consultar CNPJ');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -177,6 +216,18 @@ function App() {
       addToHistory('cnae', query);
     } catch (error) {
       toast.error('Erro ao carregar dados CNAE');
+    }
+  };
+
+  const handleCNAESelect = (cnaeId: string, tipo: 'classe' | 'subclasse', descricao: string, showToast: boolean = true) => {
+    // Adicionar ao histórico automaticamente
+    addToHistory('cnae', cnaeId);
+    
+    // Navegar para URL amigável
+    navigate(`/cnae/${cnaeId}`);
+    
+    if (showToast) {
+      toast.success(`${tipo} selecionado: ${descricao}`);
     }
   };
 
@@ -211,26 +262,31 @@ function App() {
   };
 
   const handleSaveCNAEFavorite = (id: string, tipo: 'classe' | 'subclasse', descricao: string) => {
-    const newFavorite: FavoriteCNAE = {
-      id,
-      tipo,
-      descricao,
-      createdAt: new Date().toISOString()
-    };
-    
     const isAlreadyFavorite = favorites.cnae.some(f => f.id === id && f.tipo === tipo);
     
     if (isAlreadyFavorite) {
-      toast.error('CNAE já está nos favoritos');
-      return;
+      // Remove dos favoritos
+      setFavorites(prev => ({
+        ...prev,
+        cnae: prev.cnae.filter(f => !(f.id === id && f.tipo === tipo))
+      }));
+      toast.success('CNAE removido dos favoritos!');
+    } else {
+      // Adiciona aos favoritos
+      const newFavorite: FavoriteCNAE = {
+        id,
+        tipo,
+        descricao,
+        createdAt: new Date().toISOString()
+      };
+      
+      setFavorites(prev => ({
+        ...prev,
+        cnae: [newFavorite, ...prev.cnae]
+      }));
+      
+      toast.success('CNAE salvo nos favoritos!');
     }
-    
-    setFavorites(prev => ({
-      ...prev,
-      cnae: [newFavorite, ...prev.cnae]
-    }));
-    
-    toast.success('CNAE salvo nos favoritos!');
   };
 
   const handleRemoveCNPJFavorite = (cnpj: string) => {
@@ -320,62 +376,193 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Toolbar
-        isOffline={isOffline}
-        favoritesCount={favoritesCount}
-        onShowFavorites={() => setShowFavorites(true)}
-        onShowHistory={() => setShowHistory(true)}
-        onClearCache={handleClearCache}
-        onExport={handleExport}
-        onImport={handleImport}
-      />
+             <Toolbar
+         isOffline={isOffline}
+         favoritesCount={favoritesCount}
+         onShowFavorites={() => setShowFavorites(true)}
+         onShowHistory={() => setShowHistory(true)}
+       />
       
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-        
-        <div className="mt-8">
-          {activeTab === 'cnpj' && (
-            <div className="space-y-8">
-              <SearchCNPJ
-                onSearch={handleCNPJSearch}
-                onResult={setCnpjResult}
-                isLoading={isLoading}
+      <Routes>
+        <Route path="/" element={
+          <>
+            <SEO
+              title="Consulta CNPJ e CNAE"
+              description="Consulte CNPJ e CNAE gratuitamente. Encontre informações completas de empresas brasileiras, atividades econômicas e dados da Receita Federal."
+              keywords="consulta CNPJ, consulta CNAE, empresa brasileira, receita federal, atividade econômica"
+              canonical="https://rcnpj.com"
+              structuredData={{
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "rCnpj - Consulta CNPJ e CNAE",
+                "description": "Consulte CNPJ e CNAE gratuitamente. Encontre informações completas de empresas brasileiras.",
+                "url": "https://rcnpj.com",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Web Browser",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "BRL"
+                }
+              }}
+            />
+            <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
+              <Tabs
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
               />
               
-                             {cnpjResult && (
+              <div className="mt-8">
+                {activeTab === 'cnpj' && (
+                  <div className="space-y-8">
+                    <SearchCNPJ
+                      onSearch={handleCNPJSearch}
+                      onResult={setCnpjResult}
+                      isLoading={isLoading}
+                    />
+                    
+                    {cnpjResult && (
+                      <ResultCardCNPJ
+                        empresa={cnpjResult}
+                        onSaveFavorite={handleSaveCNPJFavorite}
+                        isFavorite={favorites.cnpj.some(f => f.cnpj === cnpjResult.cnpj)}
+                      />
+                    )}
+                  </div>
+                )}
+                
+                {activeTab === 'cnae' && (
+                  <SearchCNAE
+                    classes={classes}
+                    subclasses={subclasses}
+                    onSearch={handleCNAESearch}
+                    onSelectClasse={(id) => {
+                      toast.success(`Classe selecionada: ${id}`);
+                    }}
+                    onSelectSubclasse={(id) => {
+                      toast.success(`Subclasse selecionada: ${id}`);
+                    }}
+                    isLoading={isLoading}
+                    onSaveCNAEFavorite={handleSaveCNAEFavorite}
+                    favorites={favorites.cnae}
+                  />
+                )}
+              </div>
+            </div>
+          </>
+        } />
+        
+                 <Route path="/cnpj/:cnpj" element={
+           <>
+             <SEO
+               title={cnpjResult ? `${cnpjResult.razao_social} - CNPJ ${cnpjResult.cnpj}` : 'Consulta CNPJ'}
+               description={cnpjResult ? `Informações completas da empresa ${cnpjResult.razao_social} - CNPJ ${cnpjResult.cnpj}. Endereço, telefone, CNAE, situação cadastral e mais.` : 'Consulte CNPJ e encontre informações completas de empresas brasileiras.'}
+               keywords={cnpjResult ? `${cnpjResult.razao_social}, ${cnpjResult.nome_fantasia}, CNPJ ${cnpjResult.cnpj}, empresa brasileira, consulta CNPJ` : 'consulta CNPJ, empresa brasileira'}
+               canonical={`https://rcnpj.com/cnpj/${cnpjResult?.cnpj.replace(/\D/g, '') || ''}`}
+               ogType="article"
+               structuredData={cnpjResult ? {
+                 "@context": "https://schema.org",
+                 "@type": "Organization",
+                 "name": cnpjResult.razao_social,
+                 "alternateName": cnpjResult.nome_fantasia,
+                 "taxID": cnpjResult.cnpj,
+                 "address": {
+                   "@type": "PostalAddress",
+                   "streetAddress": `${cnpjResult.logradouro}, ${cnpjResult.numero}`,
+                   "addressLocality": cnpjResult.municipio,
+                   "addressRegion": cnpjResult.uf,
+                   "postalCode": cnpjResult.cep
+                 },
+                 "telephone": cnpjResult.telefone,
+                 "email": cnpjResult.email
+               } : undefined}
+             />
+             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
+               <div className="mb-6">
+                 <button
+                   onClick={() => navigate('/')}
+                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+                 >
+                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                   </svg>
+                   <span>Voltar à consulta</span>
+                 </button>
+               </div>
+             
+             {cnpjResult && (
+               <div className="space-y-8">
                  <ResultCardCNPJ
                    empresa={cnpjResult}
                    onSaveFavorite={handleSaveCNPJFavorite}
                    isFavorite={favorites.cnpj.some(f => f.cnpj === cnpjResult.cnpj)}
                  />
-               )}
-            </div>
-          )}
-          
-                     {activeTab === 'cnae' && (
-             <SearchCNAE
-               classes={classes}
-               subclasses={subclasses}
-               onSearch={handleCNAESearch}
-               onSelectClasse={(id) => {
-                 // Função mantida para compatibilidade, mas não é mais usada
-                 toast.success(`Classe selecionada: ${id}`);
+                 
+                 {/* Lista de todos os CNAEs encontrados */}
+                 <CNAEList
+                   cnaePrincipal={{
+                     code: cnpjResult.cnae_fiscal,
+                     description: cnpjResult.cnae_fiscal_descricao
+                   }}
+                   cnaesSecundarios={cnpjResult.cnaes_secundarios}
+                 />
+               </div>
+             )}
+           </div>
+         </>
+       } />
+         
+         <Route path="/cnae/:cnae" element={
+           <>
+             <SEO
+               title="Consulta CNAE"
+               description="Consulte CNAE e encontre códigos de atividades econômicas. Classificação Nacional de Atividades Econômicas completa e atualizada."
+               keywords="consulta CNAE, atividade econômica, classificação nacional, código CNAE"
+               canonical="https://rcnpj.com/cnae"
+               structuredData={{
+                 "@context": "https://schema.org",
+                 "@type": "WebApplication",
+                 "name": "Consulta CNAE",
+                 "description": "Consulte CNAE e encontre códigos de atividades econômicas.",
+                 "url": "https://rcnpj.com/cnae",
+                 "applicationCategory": "BusinessApplication"
                }}
-               onSelectSubclasse={(id) => {
-                 // Função mantida para compatibilidade, mas não é mais usada
-                 toast.success(`Subclasse selecionada: ${id}`);
-               }}
-               isLoading={isLoading}
-               onSaveCNAEFavorite={handleSaveCNAEFavorite}
-               favorites={favorites.cnae}
              />
-           )}
-        </div>
-      </div>
+             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
+               <div className="mb-6">
+                 <button
+                   onClick={() => navigate('/')}
+                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 transition-colors"
+                 >
+                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                   </svg>
+                   <span>Voltar à consulta</span>
+                 </button>
+               </div>
+             
+                            <div className="space-y-8">
+                 <SearchCNAE
+                   classes={classes}
+                   subclasses={subclasses}
+                   onSearch={handleCNAESearch}
+                   onSelectClasse={(id) => {
+                     toast.success(`Classe selecionada: ${id}`);
+                   }}
+                   onSelectSubclasse={(id) => {
+                     toast.success(`Subclasse selecionada: ${id}`);
+                   }}
+                   isLoading={isLoading}
+                   onSaveCNAEFavorite={handleSaveCNAEFavorite}
+                   favorites={favorites.cnae}
+                   onCNAESelect={handleCNAESelect}
+                 />
+               </div>
+             </div>
+           </>
+         } />
+      </Routes>
       
       <FavoritesDrawer
         isOpen={showFavorites}
