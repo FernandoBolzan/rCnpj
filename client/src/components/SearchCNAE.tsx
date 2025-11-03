@@ -3,6 +3,7 @@ import { isDigits } from '../lib/format';
 import { rankByQuery } from '../lib/rank';
 import { CNAEClasse, CNAESubclasse } from '../types';
 import { CNAEHierarchy } from './CNAEHierarchy';
+import { buscarCNAEPorAtividade, isPossibleAtividadeSearch } from '../lib/searchCNAE';
 
 interface SearchCNAEProps {
   classes: CNAEClasse[];
@@ -89,12 +90,33 @@ export function SearchCNAE({
       setFilteredSubclasses(filteredSubclasses);
       setFilteredClasses(filteredClasses);
     } else {
-      // Busca textual
-      const rankedSubclasses = rankByQuery(subclasses, s => s.descricao, query);
-      const rankedClasses = rankByQuery(classes, c => c.descricao, query);
+      // Verificar se é uma busca por atividade
+      const isPossibleAtividade = isPossibleAtividadeSearch(query);
       
-      setFilteredSubclasses(rankedSubclasses);
-      setFilteredClasses(rankedClasses);
+      if (isPossibleAtividade) {
+        // Buscar por atividade na base do Simples Nacional
+        const resultadosPorAtividade = buscarCNAEPorAtividade(query, subclasses);
+        
+        if (resultadosPorAtividade.length > 0) {
+          // Se encontrou por atividade, usar esses resultados
+          setFilteredSubclasses(resultadosPorAtividade);
+          setFilteredClasses([]);
+        } else {
+          // Se não encontrou por atividade, fazer busca textual normal
+          const rankedSubclasses = rankByQuery(subclasses, s => s.descricao, query);
+          const rankedClasses = rankByQuery(classes, c => c.descricao, query);
+          
+          setFilteredSubclasses(rankedSubclasses);
+          setFilteredClasses(rankedClasses);
+        }
+      } else {
+        // Busca textual normal
+        const rankedSubclasses = rankByQuery(subclasses, s => s.descricao, query);
+        const rankedClasses = rankByQuery(classes, c => c.descricao, query);
+        
+        setFilteredSubclasses(rankedSubclasses);
+        setFilteredClasses(rankedClasses);
+      }
     }
     
     // Mostrar autocomplete quando houver resultados
@@ -248,7 +270,7 @@ export function SearchCNAE({
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 onFocus={() => query.trim() && setShowAutocomplete(true)}
-                placeholder="Digite código ou descrição..."
+                placeholder="Digite código, descrição ou atividade..."
                 className="w-full pl-12 pr-4 py-3 sm:py-4 text-base sm:text-lg rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-200"
                 disabled={isLoading}
                 autoComplete="off"
@@ -330,6 +352,16 @@ export function SearchCNAE({
                                   <p className="text-xs sm:text-sm text-gray-700 mt-1 line-clamp-2">
                                     {subclasse.descricao}
                                   </p>
+                                  {(subclasse as any).atividadeEncontrada && (
+                                    <div className="mt-2 pt-2 border-t border-gray-200">
+                                      <p className="text-xs text-indigo-700 flex items-start gap-1">
+                                        <svg className="w-3 h-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        <span className="font-medium">Atividade:</span> {(subclasse as any).atividadeEncontrada}
+                                      </p>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </button>
@@ -393,9 +425,19 @@ export function SearchCNAE({
                 </div>
               )}
             </div>
-            <p className="mt-3 text-sm text-gray-500">
-              💡 Dica: Digite números para buscar por código ou texto para buscar por descrição. Use as setas ↑↓ para navegar.
-            </p>
+            <div className="mt-3 space-y-2">
+              <p className="text-sm text-gray-600">
+                💡 <strong>Busque de 3 formas:</strong>
+              </p>
+              <ul className="text-xs sm:text-sm text-gray-600 space-y-1 ml-6">
+                <li>• <strong>Por código:</strong> Digite números (ex: <code className="bg-gray-100 px-1.5 py-0.5 rounded">4120</code>)</li>
+                <li>• <strong>Por descrição:</strong> Digite o nome do CNAE (ex: <code className="bg-gray-100 px-1.5 py-0.5 rounded">construção</code>)</li>
+                <li>• <strong>Por atividade:</strong> Digite a atividade (ex: <code className="bg-gray-100 px-1.5 py-0.5 rounded">padaria</code>, <code className="bg-gray-100 px-1.5 py-0.5 rounded">desenvolvimento software</code>)</li>
+              </ul>
+              <p className="text-xs text-gray-500 ml-6">
+                ⌨️ Use as setas ↑↓ para navegar, Tab para trocar de aba, Enter para selecionar
+              </p>
+            </div>
           </div>
         </div>
       </div>
