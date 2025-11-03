@@ -27,14 +27,28 @@ export function analisarSimplesNacionalEmpresa(
   const observacoes: string[] = [];
   const cnaesProblematicos: Array<{ codigo: string; descricao: string; motivo: string }> = [];
   
+  // Validar CNAE principal
+  if (!cnaePrincipal || !cnaePrincipal.code) {
+    return {
+      podeSerOptante: false,
+      motivoNaoPode: 'CNAE principal não informado',
+      anexoPrincipal: undefined,
+      anexosSecundarios: [],
+      cnaesProblematicos: [],
+      observacoes: ['CNAE principal não disponível. Não é possível analisar.']
+    };
+  }
+  
   // Analisar CNAE principal
   const infoPrincipal = getSimplesNacionalInfo(cnaePrincipal.code);
   
-  // Analisar CNAEs secundários
-  const infosSecundarios = cnaesSecundarios.map(cnae => ({
-    cnae,
-    info: getSimplesNacionalInfo(cnae.code)
-  }));
+  // Analisar CNAEs secundários (filtrar inválidos)
+  const infosSecundarios = cnaesSecundarios
+    .filter(cnae => cnae && cnae.code && typeof cnae.code === 'string')
+    .map(cnae => ({
+      cnae,
+      info: getSimplesNacionalInfo(cnae.code)
+    }));
   
   // Verificar se há algum CNAE que impede o Simples Nacional
   if (!infoPrincipal.permitido) {

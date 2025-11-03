@@ -2637,6 +2637,11 @@ const categorizacaoPorSetor: Record<string, CNAESimplesNacional> = {
 
 // Função auxiliar para formatar CNAE no padrão correto
 function formatCNAEId(cnaeId: string): string[] {
+  // Validação
+  if (!cnaeId || typeof cnaeId !== 'string') {
+    return [];
+  }
+  
   // Remove espaços
   let cleaned = cnaeId.trim().replace(/\s+/g, '');
   
@@ -2654,30 +2659,43 @@ function formatCNAEId(cnaeId: string): string[] {
   // Exemplos: 0111301 -> 0111-3/01
   //           47291 -> 4729-1
   
-  if (cleaned.length === 7) {
+  // Remover todos os caracteres não numéricos para normalizar
+  const onlyNumbers = cleaned.replace(/\D/g, '');
+  
+  if (onlyNumbers.length === 7) {
     // Formato de 7 dígitos: XXXXXYY -> XXXX-X/YY
-    const formatted = `${cleaned.substring(0, 4)}-${cleaned.charAt(4)}/${cleaned.substring(5)}`;
+    const formatted = `${onlyNumbers.substring(0, 4)}-${onlyNumbers.charAt(4)}/${onlyNumbers.substring(5)}`;
     formats.push(formatted);
-  } else if (cleaned.length === 5) {
+  } else if (onlyNumbers.length === 5) {
     // Formato de 5 dígitos: XXXXX -> XXXX-X
-    const formatted = `${cleaned.substring(0, 4)}-${cleaned.charAt(4)}`;
+    const formatted = `${onlyNumbers.substring(0, 4)}-${onlyNumbers.charAt(4)}`;
     formats.push(formatted);
-  } else if (cleaned.length === 6) {
+  } else if (onlyNumbers.length === 6) {
     // Formato de 6 dígitos pode ser XXXX-XX -> tenta XXXX-X/X
-    const formatted = `${cleaned.substring(0, 4)}-${cleaned.charAt(4)}/${cleaned.charAt(5)}`;
+    const formatted = `${onlyNumbers.substring(0, 4)}-${onlyNumbers.charAt(4)}/${onlyNumbers.charAt(5)}`;
     formats.push(formatted);
+  }
+  
+  // Adicionar também só os números (para busca direta)
+  if (onlyNumbers.length > 0 && onlyNumbers !== cleaned) {
+    formats.push(onlyNumbers);
   }
   
   return formats;
 }
 
 // Função para obter informações do Simples Nacional
-export function getSimplesNacionalInfo(cnaeId: string): CNAESimplesNacional {
+export function getSimplesNacionalInfo(cnaeId: string | number): CNAESimplesNacional {
+  // Converter para string se for número
+  const cnaeIdStr = String(cnaeId || '');
+  
   // Tentar diferentes formatos do ID
-  const possibleFormats = formatCNAEId(cnaeId);
+  const possibleFormats = formatCNAEId(cnaeIdStr);
   
   console.log('🔍 Buscando CNAE:', {
     original: cnaeId,
+    tipo: typeof cnaeId,
+    convertido: cnaeIdStr,
     formatos_testados: possibleFormats
   });
   
@@ -2691,7 +2709,7 @@ export function getSimplesNacionalInfo(cnaeId: string): CNAESimplesNacional {
   }
   
   // 2. Se não encontrou, usar categorização automática por setor (primeiros 2 dígitos)
-  const cleaned = cnaeId.trim().replace(/\D/g, '');
+  const cleaned = cnaeIdStr.trim().replace(/\D/g, '');
   const setorCode = cleaned.substring(0, 2);
   
   const categoriaPorSetor = categorizacaoPorSetor[setorCode];
