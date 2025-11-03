@@ -1,9 +1,12 @@
 import React from 'react';
+import { getBrandConfig } from '../config/brand';
+
+const brand = getBrandConfig();
 
 export function RContBanner() {
   return (
     <a 
-      href="https://www.rcont.org" 
+      href={brand.website} 
       target="_blank" 
       rel="noopener noreferrer"
       className="block mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl sm:rounded-2xl hover:shadow-lg transition-all duration-300 group"
@@ -20,15 +23,15 @@ export function RContBanner() {
               💼 Precisa abrir sua empresa?
             </p>
             <p className="text-xs text-blue-700 mt-0.5 hidden sm:block">
-              Fale com um contador especializado da <strong className="text-blue-800">RCont</strong>
+              {brand.bannerText}
             </p>
             <p className="text-xs text-blue-700 mt-0.5 sm:hidden">
-              Fale com a <strong className="text-blue-800">RCont</strong>
+              Fale com a <strong className="text-blue-800">{brand.name}</strong>
             </p>
           </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-2 text-blue-600 group-hover:translate-x-1 transition-transform flex-shrink-0">
-          <span className="text-xs font-medium hidden md:inline">Saiba mais</span>
+          <span className="text-xs font-medium hidden md:inline">{brand.bannerCTA}</span>
           <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

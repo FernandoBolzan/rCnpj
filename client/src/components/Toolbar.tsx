@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '../lib/api';
+import { getBrandConfig } from '../config/brand';
 
 interface ToolbarProps {
   isOffline: boolean;
@@ -7,6 +8,8 @@ interface ToolbarProps {
   onShowFavorites: () => void;
   onShowHistory: () => void;
 }
+
+const brand = getBrandConfig();
 
 export function Toolbar({
   isOffline,
@@ -30,8 +33,8 @@ export function Toolbar({
         {/* Logo e Status */}
         <div className="flex items-center space-x-3 sm:space-x-4">
           <img 
-            src="/logo-rcont.png" 
-            alt="RCont Logo" 
+            src={brand.logo} 
+            alt={`${brand.name} Logo`} 
             className="h-8 sm:h-10 w-auto object-contain"
           />
           

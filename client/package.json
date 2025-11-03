@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:rcont": "vite --mode rcont",
+    "dev:sistematizo": "vite --mode sistematizo",
     "build": "tsc && vite build",
+    "build:rcont": "tsc && vite build --mode rcont",
+    "build:sistematizo": "tsc && vite build --mode sistematizo",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
