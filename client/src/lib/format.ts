@@ -46,26 +46,88 @@ export function formatTelefone(telefone: string | null | undefined): string {
   if (!telefone) return '';
   const clean = stripNonDigits(telefone);
   
-  // Celular com DDD (11 dígitos): (XX) X XXXX-XXXX
+  // Celular com DDD (11 dígitos): (XX) 9XXXX-XXXX
+  // Padrão: 9 como primeiro dígito após DDD indica celular
   if (clean.length === 11) {
-    return clean.replace(/^(\d{2})(\d{1})(\d{4})(\d{4})$/, '($1) $2 $3-$4');
+    const primeiroDigito = clean.charAt(2);
+    if (primeiroDigito === '9') {
+      return '📱 ' + clean.replace(/^(\d{2})(\d{1})(\d{4})(\d{4})$/, '($1) $2 $3-$4');
+    }
+    // Se não começa com 9, pode ser fixo com erro ou número especial
+    return '📞 ' + clean.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3') + ' ⚠️';
   }
   
-  // Celular sem DDD (9 dígitos): X XXXX-XXXX
-  if (clean.length === 9) {
-    return clean.replace(/^(\d{1})(\d{4})(\d{4})$/, '$1 $2-$3');
-  }
-  
-  // Telefone fixo com DDD (10 dígitos): (XX) XXXX-XXXX
+  // CORREÇÃO AUTOMÁTICA: Telefone com 10 dígitos que parece celular
+  // Se o primeiro dígito após DDD é 9, 8 ou 7, falta o 9º dígito
+  // Regra nacional: 9º dígito foi implementado em TODO o Brasil
   if (clean.length === 10) {
-    return clean.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+    const ddd = clean.substring(0, 2);
+    const primeiroDigitoLocal = clean.charAt(2);
+    
+    // Se começa com 9, 8 ou 7 = É celular antigo SEM o 9º dígito
+    if (['9', '8', '7'].includes(primeiroDigitoLocal)) {
+      // ADICIONAR o 9º dígito no início do número local
+      // Exemplo: 9991951112 → DDD:99 + 9(adicionar) + 91951112(8 dígitos locais) → (99) 9 9195-1112
+      const numeroLocal = clean.substring(2); // Pega os 8 dígitos locais
+      const numeroCorrigido = ddd + '9' + numeroLocal; // DDD + 9º dígito + número = 11 dígitos
+      return '📱 ' + numeroCorrigido.replace(/^(\d{2})(\d{1})(\d{4})(\d{4})$/, '($1) $2 $3-$4');
+    }
+    
+    // Se começa com 2-5 = É fixo
+    if (['2', '3', '4', '5'].includes(primeiroDigitoLocal)) {
+      return '☎️ ' + clean.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+    }
+    
+    // Outros casos
+    return '📞 ' + clean.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
   }
   
-  // Telefone fixo sem DDD (8 dígitos): XXXX-XXXX
+  // Celular sem DDD (9 dígitos): 9XXXX-XXXX
+  // Já tem o 9º dígito
+  if (clean.length === 9) {
+    const primeiroDigito = clean.charAt(0);
+    if (primeiroDigito === '9') {
+      return '📱 ' + clean.replace(/^(\d{1})(\d{4})(\d{4})$/, '$1 $2-$3');
+    }
+    // Se começa com 8 ou 7, pode ser celular antigo sem DDD e sem 9º dígito
+    if (['8', '7'].includes(primeiroDigito)) {
+      return '📱 ' + clean.replace(/^(\d{1})(\d{4})(\d{4})$/, '$1 $2-$3') + ' (sem DDD)';
+    }
+    // Outros casos - fixo sem DDD provável
+    return '☎️ ' + clean.replace(/^(\d{4})(\d{4})$/, '$1-$2');
+  }
+  
+  // Telefone sem DDD (8 dígitos): XXXX-XXXX
+  // Pode ser fixo OU celular antigo sem o 9º dígito
   if (clean.length === 8) {
-    return clean.replace(/^(\d{4})(\d{4})$/, '$1-$2');
+    const primeiroDigito = clean.charAt(0);
+    
+    // Se começa com 9, 8 ou 7 = Celular antigo SEM 9º dígito
+    // CORRIGIR adicionando o 9
+    if (['9', '8', '7'].includes(primeiroDigito)) {
+      const numeroCorrigido = '9' + clean;
+      return '📱 ' + numeroCorrigido.replace(/^(\d{1})(\d{4})(\d{4})$/, '$1 $2-$3') + ' (corrigido)';
+    }
+    
+    // Se começa com 2, 3, 4, 5 = Fixo
+    if (['2', '3', '4', '5'].includes(primeiroDigito)) {
+      return '☎️ ' + clean.replace(/^(\d{4})(\d{4})$/, '$1-$2');
+    }
+    
+    // Outros casos
+    return '📞 ' + clean.replace(/^(\d{4})(\d{4})$/, '$1-$2');
   }
   
-  // Se não se encaixa em nenhum padrão, retorna original
-  return telefone;
+  // Números com 7 dígitos ou menos (provavelmente sem DDD)
+  if (clean.length === 7) {
+    return '📞 ' + clean.replace(/^(\d{3})(\d{4})$/, '$1-$2');
+  }
+  
+  // Números muito longos ou curtos - mostrar com aviso
+  if (clean.length > 11) {
+    return '📞 ' + clean + ' ⚠️';
+  }
+  
+  // Fallback: retorna original com emoji
+  return '📞 ' + telefone;
 }
