@@ -5,8 +5,8 @@ Este projeto suporta **múltiplas marcas** (RCont e Sistematizo) usando o mesmo 
 ## 📋 Como Funciona
 
 ### Marcas Disponíveis:
-- **RCont** - www.rcont.org (azul)
-- **Sistematizo** - www.sistematizo.com.br (roxo)
+- **RCont** - rcont.org (azul)
+- **Sistematizo** - sistematizo.com.br (roxo)
 
 ### Sistema Automático:
 O sistema detecta a marca por:

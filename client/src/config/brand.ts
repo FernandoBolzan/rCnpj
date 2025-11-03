@@ -17,7 +17,7 @@ const brands: Record<BrandType, BrandConfig> = {
     name: 'RCont',
     logo: '/logo-rcont.png',
     primaryColor: '#3b82f6', // blue-600
-    website: 'https://www.rcont.org',
+    website: 'https://rcont.org',
     bannerText: 'Fale com um contador especializado da RCont',
     bannerCTA: 'Saiba mais'
   },
@@ -25,9 +25,9 @@ const brands: Record<BrandType, BrandConfig> = {
     name: 'Sistematizo',
     logo: '/logo-sistematizo.png',
     primaryColor: '#8b5cf6', // violet-600
-    website: 'https://www.sistematizo.com.br',
-    bannerText: 'Automatize sua contabilidade com Sistematizo',
-    bannerCTA: 'Conhecer'
+    website: 'https://sistematizo.com.br',
+    bannerText: 'Fale com um contador especializado da Sistematizo',
+    bannerCTA: 'Saiba mais'
   }
 };
 

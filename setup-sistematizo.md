@@ -1,36 +1,36 @@
 # 🚀 Setup Rápido para Sistematizo
 
-## Passo 1: Criar logo do Sistematizo
+## ✅ Passo 1: Logo (JÁ FEITO!)
 
-Coloque a logo do Sistematizo em:
-```
-client/public/logo-sistematizo.png
-```
+As logos já estão configuradas:
+- ✅ `client/public/logo-rcont.png`
+- ✅ `client/public/logo-sistematizo.png`
 
 ---
 
-## Passo 2: Criar repositório no GitHub
+## Passo 2: Criar repositório no GitHub para Sistematizo
 
 1. Vá em: https://github.com/new
-2. Nome: `sistematizo-cnpj` (ou outro nome)
-3. Deixe **vazio** (sem README)
-4. Criar repositório
+2. Nome sugerido: `sistematizo-cnpj`
+3. Deixe **vazio** (sem README, sem .gitignore, sem license)
+4. Clique em **"Create repository"**
+5. **Copie a URL** do repositório (ex: `https://github.com/SeuUsuario/sistematizo-cnpj.git`)
 
 ---
 
-## Passo 3: Adicionar remote do Sistematizo
+## Passo 3: Adicionar Remote do Sistematizo
 
-```bash
-cd C:\Users\fbolz\Documents\Code\rCnpj
+Abra o PowerShell/Terminal na pasta do projeto e execute:
 
-# Adicionar remote
+```powershell
+# Adicionar remote do Sistematizo
 git remote add sistematizo https://github.com/SeuUsuario/sistematizo-cnpj.git
 
-# Verificar
+# Verificar remotes configurados
 git remote -v
 ```
 
-Deve mostrar:
+**Deve mostrar:**
 ```
 origin       https://github.com/FernandoBolzan/rCnpj.git (fetch)
 origin       https://github.com/FernandoBolzan/rCnpj.git (push)
@@ -40,12 +40,14 @@ sistematizo  https://github.com/SeuUsuario/sistematizo-cnpj.git (push)
 
 ---
 
-## Passo 4: Fazer primeiro push para Sistematizo
+## Passo 4: Fazer Primeiro Push para Sistematizo
 
-```bash
-# Push da branch main para o repositório Sistematizo
+```powershell
+# Push de todo o código para o repositório Sistematizo
 git push sistematizo main
 ```
+
+✅ **Pronto! Agora você tem dois repositórios!**
 
 ---
 
