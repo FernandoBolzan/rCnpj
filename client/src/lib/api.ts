@@ -115,7 +115,7 @@ class API {
       this.isOffline = false;
       return await response.json();
     } catch (error) {
-      console.error('Erro na IBGE API:', error);
+      console.error('Erro na API de CNAE:', error);
       this.isOffline = true;
       return null;
     }
@@ -376,7 +376,6 @@ class API {
   }
 
   async getClasse(id: string): Promise<CNAEClasse | null> {
-    // Para CNAE, usar IBGE API
     const result = await this.requestIBGE<any>(`/api/v2/cnae/classes/${id}`);
     
     if (result) {
@@ -394,7 +393,6 @@ class API {
   }
 
   async getSubclasse(id: string): Promise<CNAESubclasse | null> {
-    // Para CNAE, usar IBGE API
     const result = await this.requestIBGE<any>(`/api/v2/cnae/subclasses/${id}`);
     
     if (result) {
@@ -410,7 +408,6 @@ class API {
   }
 
   async getClasses(): Promise<CNAEClasse[]> {
-    // Para CNAE, usar IBGE API
     const result = await this.requestIBGE<any[]>('/api/v2/cnae/classes');
     
     if (result && result.length > 0) {
@@ -428,7 +425,6 @@ class API {
   }
 
   async getSubclasses(): Promise<CNAESubclasse[]> {
-    // Para CNAE, usar IBGE API
     const result = await this.requestIBGE<any[]>('/api/v2/cnae/subclasses');
     
     if (result && result.length > 0) {

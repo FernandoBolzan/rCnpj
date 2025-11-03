@@ -28,23 +28,19 @@ export function Toolbar({
     <div className="bg-white border-b border-gray-200 px-4 py-3 relative">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         {/* Logo e Status */}
-        <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-bold text-gray-900">rCnpj</h1>
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          <img 
+            src="/logo-rcont.png" 
+            alt="RCont Logo" 
+            className="h-8 sm:h-10 w-auto object-contain"
+          />
           
-          <div className="hidden sm:flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${isOffline ? 'bg-red-500' : 'bg-green-500'}`} />
-            <span className={`text-sm ${isOffline ? 'text-red-600' : 'text-green-600'}`}>
-              {isOffline ? 'Offline (mock)' : 'Online'}
+            <span className={`text-xs sm:text-sm ${isOffline ? 'text-red-600' : 'text-green-600'}`}>
+              {isOffline ? 'Offline' : 'Online'}
             </span>
           </div>
-        </div>
-
-        {/* Status Mobile */}
-        <div className="sm:hidden flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isOffline ? 'bg-red-500' : 'bg-green-500'}`} />
-          <span className={`text-xs ${isOffline ? 'text-red-600' : 'text-green-600'}`}>
-            {isOffline ? 'Offline' : 'Online'}
-          </span>
         </div>
         
         {/* Botões Desktop */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CNPJResponse } from '../types';
 import { formatCNPJ, formatCNAE } from '../lib/format';
+import { RContBanner } from './RContBanner';
 
 interface ResultCardCNPJProps {
   empresa: CNPJResponse;
@@ -14,39 +15,42 @@ export function ResultCardCNPJ({
   isFavorite
 }: ResultCardCNPJProps) {
   return (
-    <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+    <>
+      <RContBanner />
+      <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
       {/* Header com gradiente */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-2">{empresa.razao_social}</h2>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 sm:p-6 text-white">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg sm:text-2xl font-bold mb-2 break-words">{empresa.razao_social}</h2>
             {empresa.nome_fantasia && (
-              <p className="text-blue-100 text-lg">"{empresa.nome_fantasia}"</p>
+              <p className="text-blue-100 text-sm sm:text-lg break-words">"{empresa.nome_fantasia}"</p>
             )}
-            <p className="text-blue-100 mt-3 font-mono text-lg">
+            <p className="text-blue-100 mt-2 sm:mt-3 font-mono text-sm sm:text-lg">
               {formatCNPJ(empresa.cnpj)}
             </p>
           </div>
           <button
             onClick={onSaveFavorite}
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+            className={`rounded-2xl px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition-all duration-200 hover:scale-105 flex-shrink-0 ${
               isFavorite
                 ? 'bg-yellow-400 text-yellow-900 hover:bg-yellow-300 shadow-lg'
                 : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
             }`}
           >
-            {isFavorite ? '❤️ Favoritado' : '⭐ Favoritar'}
+            <span className="hidden sm:inline">{isFavorite ? '❤️ Favoritado' : '⭐ Favoritar'}</span>
+            <span className="sm:hidden">{isFavorite ? '❤️' : '⭐'}</span>
           </button>
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Informações Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl">
             <div className="flex items-center space-x-2 mb-2">
               <div className={`w-3 h-3 rounded-full ${empresa.descricao_situacao_cadastral === 'ATIVA' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <h3 className="font-semibold text-gray-900">Status</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Status</h3>
             </div>
             <p className={`text-sm font-medium ${
               empresa.descricao_situacao_cadastral === 'ATIVA' ? 'text-green-700' : 'text-red-700'
@@ -79,7 +83,7 @@ export function ResultCardCNPJ({
               <div className={`w-3 h-3 rounded-full ${
                 empresa.simples_nacional?.optante ? 'bg-orange-500' : 'bg-gray-400'
               }`}></div>
-              <h3 className="font-semibold text-gray-900">Simples Nacional</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Simples Nacional</h3>
             </div>
             <div className="flex items-center space-x-2">
               <span className={`text-sm font-medium ${
@@ -289,7 +293,7 @@ export function ResultCardCNPJ({
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">Quadro de Sócios</h3>
+                <h3 className="text-sm font-semibold text-gray-900">Quadro de Sócios</h3>
                 <p className="text-sm text-gray-600">Sócios e administradores</p>
               </div>
             </div>
@@ -326,5 +330,6 @@ export function ResultCardCNPJ({
         )}
       </div>
     </div>
+    </>
   );
 }

@@ -100,6 +100,31 @@ export interface CNAESubclasse {
   };
 }
 
+export interface CNAESimplesNacional {
+  permitido: boolean;
+  anexo?: 'I' | 'II' | 'III' | 'IV' | 'V';
+  aliquota_min?: number;
+  aliquota_max?: number;
+  atividades?: string[];
+  observacoes?: string;
+  // Para CNAEs não permitidos - alíquotas do Lucro Presumido/Real
+  regime_alternativo?: {
+    regime: 'Lucro Presumido' | 'Lucro Real';
+    irpj?: number;
+    csll?: number;
+    pis?: number;
+    cofins?: number;
+    iss?: number;
+    total_aprox?: number;
+  };
+}
+
+export interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number;
+}
+
 export interface FavoriteCNPJ {
   cnpj: string;
   razao_social: string;
