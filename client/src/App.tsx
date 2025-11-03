@@ -10,6 +10,7 @@ import { CNAEList } from './components/CNAEList';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { SEO } from './components/SEO';
+import { BrandHead } from './components/BrandHead';
 import { api } from './lib/api';
 import { storage } from './lib/storage';
 import { 
@@ -376,12 +377,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-             <Toolbar
-         isOffline={isOffline}
-         favoritesCount={favoritesCount}
-         onShowFavorites={() => setShowFavorites(true)}
-         onShowHistory={() => setShowHistory(true)}
-       />
+      <BrandHead />
+      
+      <Toolbar
+        isOffline={isOffline}
+        favoritesCount={favoritesCount}
+        onShowFavorites={() => setShowFavorites(true)}
+        onShowHistory={() => setShowHistory(true)}
+      />
       
       <Routes>
         <Route path="/" element={
