@@ -90,27 +90,19 @@ export function SearchCNAE({
       setFilteredSubclasses(filteredSubclasses);
       setFilteredClasses(filteredClasses);
     } else {
-      // Verificar se é uma busca por atividade
-      const isPossibleAtividade = isPossibleAtividadeSearch(query);
+      // Buscar por atividade na base do Simples Nacional PRIMEIRO
+      const resultadosPorAtividade = buscarCNAEPorAtividade(query, subclasses);
       
-      if (isPossibleAtividade) {
-        // Buscar por atividade na base do Simples Nacional
-        const resultadosPorAtividade = buscarCNAEPorAtividade(query, subclasses);
-        
-        if (resultadosPorAtividade.length > 0) {
-          // Se encontrou por atividade, usar esses resultados
-          setFilteredSubclasses(resultadosPorAtividade);
-          setFilteredClasses([]);
-        } else {
-          // Se não encontrou por atividade, fazer busca textual normal
-          const rankedSubclasses = rankByQuery(subclasses, s => s.descricao, query);
-          const rankedClasses = rankByQuery(classes, c => c.descricao, query);
-          
-          setFilteredSubclasses(rankedSubclasses);
-          setFilteredClasses(rankedClasses);
-        }
+      console.log('📊 Resultados por atividade:', resultadosPorAtividade.length);
+      
+      if (resultadosPorAtividade.length > 0) {
+        // Se encontrou por atividade, usar SOMENTE esses resultados
+        console.log('✅ Usando resultados por atividade');
+        setFilteredSubclasses(resultadosPorAtividade);
+        setFilteredClasses([]);
       } else {
-        // Busca textual normal
+        // Se não encontrou por atividade, fazer busca textual normal (descrição CNAE)
+        console.log('📝 Usando busca por descrição');
         const rankedSubclasses = rankByQuery(subclasses, s => s.descricao, query);
         const rankedClasses = rankByQuery(classes, c => c.descricao, query);
         
