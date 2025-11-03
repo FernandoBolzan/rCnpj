@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CNPJResponse } from '../types';
 import { formatCNPJ, formatCNAE } from '../lib/format';
 import { RContBanner } from './RContBanner';
+import { analisarSimplesNacionalEmpresa } from '../lib/simplesNacionalAnalyzer';
 
 interface ResultCardCNPJProps {
   empresa: CNPJResponse;
@@ -14,6 +15,14 @@ export function ResultCardCNPJ({
   onSaveFavorite,
   isFavorite
 }: ResultCardCNPJProps) {
+  // Analisar Simples Nacional da empresa
+  const analiseSimples = useMemo(() => {
+    return analisarSimplesNacionalEmpresa(
+      { code: empresa.cnae_fiscal, description: empresa.cnae_fiscal_descricao },
+      empresa.cnaes_secundarios
+    );
+  }, [empresa.cnae_fiscal, empresa.cnae_fiscal_descricao, empresa.cnaes_secundarios]);
+
   return (
     <>
       <RContBanner />
@@ -98,6 +107,178 @@ export function ResultCardCNPJ({
               )}
             </div>
           </div>
+        </div>
+
+        {/* Análise do Simples Nacional */}
+        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 p-5 rounded-2xl">
+          <div className="flex items-start space-x-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-indigo-900 mb-1">
+                Análise do Simples Nacional
+              </h3>
+              <p className="text-xs text-indigo-700">
+                Baseada nos CNAEs cadastrados da empresa
+              </p>
+            </div>
+          </div>
+
+          {analiseSimples.podeSerOptante ? (
+            <div className="space-y-4">
+              {/* Status Positivo */}
+              <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg border-2 border-green-300">
+                <svg className="w-6 h-6 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-green-900">
+                    ✅ Esta empresa PODE ser optante do Simples Nacional
+                  </p>
+                  <p className="text-xs text-green-700 mt-0.5">
+                    Baseado na análise dos CNAEs cadastrados
+                  </p>
+                </div>
+              </div>
+
+              {/* Anexo e Alíquotas */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {analiseSimples.anexoPrincipal && (
+                  <div className="p-3 bg-white rounded-lg border-2 border-indigo-300">
+                    <div className="text-xs text-indigo-600 font-semibold mb-1">ANEXO PRINCIPAL</div>
+                    <div className="text-2xl font-bold text-indigo-900">Anexo {analiseSimples.anexoPrincipal}</div>
+                  </div>
+                )}
+                
+                {analiseSimples.aliquotaMinima !== undefined && analiseSimples.aliquotaMaxima !== undefined && (
+                  <div className="p-3 bg-white rounded-lg border-2 border-purple-300 col-span-2">
+                    <div className="text-xs text-purple-600 font-semibold mb-1">ALÍQUOTA (SIMPLES)</div>
+                    <div className="text-2xl font-bold text-purple-900">
+                      {analiseSimples.aliquotaMinima}% a {analiseSimples.aliquotaMaxima}%
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Anexos Secundários */}
+              {analiseSimples.anexosSecundarios.length > 0 && (
+                <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-300">
+                  <div className="text-xs text-yellow-800 font-semibold mb-1">ANEXOS SECUNDÁRIOS</div>
+                  <div className="flex gap-2 flex-wrap">
+                    {analiseSimples.anexosSecundarios.map(anexo => (
+                      <span key={anexo} className="px-2 py-1 bg-yellow-200 text-yellow-900 text-xs font-semibold rounded">
+                        Anexo {anexo}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* CNAEs Problemáticos */}
+              {analiseSimples.cnaesProblematicos.length > 0 && (
+                <div className="p-3 bg-orange-50 rounded-lg border border-orange-300">
+                  <div className="text-xs text-orange-800 font-semibold mb-2 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    CNAEs NÃO PERMITIDOS NO SIMPLES
+                  </div>
+                  <ul className="space-y-1.5">
+                    {analiseSimples.cnaesProblematicos.map((cnae, index) => (
+                      <li key={index} className="text-xs text-orange-900">
+                        <span className="font-mono font-semibold">{cnae.codigo}</span> - {cnae.descricao}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Observações */}
+              {analiseSimples.observacoes.length > 0 && (
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <ul className="space-y-1.5">
+                    {analiseSimples.observacoes.map((obs, index) => (
+                      <li key={index} className="text-xs text-blue-800 flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5 flex-shrink-0">•</span>
+                        <span>{obs}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Status Negativo */}
+              <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg border-2 border-red-300">
+                <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-red-900 mb-1">
+                    ❌ Esta empresa NÃO PODE ser optante do Simples Nacional
+                  </p>
+                  <p className="text-xs text-red-700">
+                    {analiseSimples.motivoNaoPode}
+                  </p>
+                </div>
+              </div>
+
+              {/* Regime Alternativo */}
+              {analiseSimples.regimeAlternativo && (
+                <div className="p-4 bg-orange-50 rounded-lg border border-orange-300">
+                  <h4 className="text-sm font-bold text-orange-900 mb-2 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    Regime Aplicável: {analiseSimples.regimeAlternativo.regime}
+                  </h4>
+                  <div className="p-3 bg-orange-100 rounded-lg">
+                    <div className="text-xs text-orange-700 font-semibold mb-1">CARGA TRIBUTÁRIA APROXIMADA</div>
+                    <div className="text-3xl font-bold text-orange-900">
+                      {analiseSimples.regimeAlternativo.totalAprox}%
+                    </div>
+                  </div>
+                  <p className="text-xs text-orange-700 mt-2">
+                    ℹ️ Tributação pelo regime de {analiseSimples.regimeAlternativo.regime}
+                  </p>
+                </div>
+              )}
+
+              {/* CNAEs Problemáticos */}
+              {analiseSimples.cnaesProblematicos.length > 0 && (
+                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="text-xs text-red-800 font-semibold mb-2">CNAEs QUE IMPEDEM O SIMPLES:</div>
+                  <ul className="space-y-2">
+                    {analiseSimples.cnaesProblematicos.map((cnae, index) => (
+                      <li key={index} className="text-xs text-red-900 p-2 bg-white rounded border border-red-200">
+                        <div className="font-mono font-bold">{cnae.codigo}</div>
+                        <div className="text-gray-700 mt-0.5">{cnae.descricao}</div>
+                        <div className="text-red-600 mt-1 text-xs italic">{cnae.motivo}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Observações */}
+              {analiseSimples.observacoes.length > 0 && (
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <ul className="space-y-1.5">
+                    {analiseSimples.observacoes.map((obs, index) => (
+                      <li key={index} className="text-xs text-gray-700 flex items-start gap-2">
+                        <span className="text-gray-500 mt-0.5 flex-shrink-0">•</span>
+                        <span>{obs}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
                  {/* Endereço */}
