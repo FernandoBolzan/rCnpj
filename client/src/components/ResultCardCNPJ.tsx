@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { CNPJResponse } from '../types';
-import { formatCNPJ, formatCNAE } from '../lib/format';
+import { formatCNPJ, formatCNAE, formatCEP, formatTelefone } from '../lib/format';
 import { RContBanner } from './RContBanner';
 import { analisarSimplesNacionalEmpresa } from '../lib/simplesNacionalAnalyzer';
 
@@ -297,7 +297,7 @@ export function ResultCardCNPJ({
                  {empresa.complemento && ` - ${empresa.complemento}`}
                </p>
                <p className="text-sm text-gray-700">
-                 {empresa.municipio}/{empresa.uf} - CEP: {empresa.cep}
+                 {empresa.municipio}/{empresa.uf} - CEP: {formatCEP(empresa.cep)}
                </p>
                {empresa.codigo_municipio && (
                  <p className="text-xs text-gray-500 mt-1">
@@ -321,10 +321,10 @@ export function ResultCardCNPJ({
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-2">Contato</h3>
                   {empresa.telefone && (
-                    <p className="text-sm text-gray-700 mb-1">📞 {empresa.telefone}</p>
+                    <p className="text-sm text-gray-700 mb-1">📞 {formatTelefone(empresa.telefone)}</p>
                   )}
                   {empresa.ddd_telefone_1 && (
-                    <p className="text-sm text-gray-700 mb-1">📞 {empresa.ddd_telefone_1}</p>
+                    <p className="text-sm text-gray-700 mb-1">📞 {formatTelefone(empresa.ddd_telefone_1)}</p>
                   )}
                   {empresa.email && (
                     <p className="text-sm text-gray-700">📧 {empresa.email}</p>
