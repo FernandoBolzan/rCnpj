@@ -6,6 +6,7 @@ export type BrandType = 'rcont' | 'sistematizo';
 interface BrandConfig {
   name: string;
   logo: string;
+  favicon: string;
   primaryColor: string;
   website: string;
   bannerText: string;
@@ -16,6 +17,7 @@ const brands: Record<BrandType, BrandConfig> = {
   rcont: {
     name: 'RCont',
     logo: '/logo-rcont.png',
+    favicon: '/rcont-icon.png',
     primaryColor: '#3b82f6', // blue-600
     website: 'https://rcont.org',
     bannerText: 'Fale com um contador especializado da RCont',
@@ -24,6 +26,7 @@ const brands: Record<BrandType, BrandConfig> = {
   sistematizo: {
     name: 'Sistematizo',
     logo: '/logo-sistematizo.png',
+    favicon: '/sistematizo-icon.png',
     primaryColor: '#8b5cf6', // violet-600
     website: 'https://sistematizo.com.br',
     bannerText: 'Fale com um contador especializado da Sistematizo',

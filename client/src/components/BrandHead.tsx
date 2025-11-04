@@ -14,6 +14,11 @@ export function BrandHead() {
   
   return (
     <Helmet>
+      {/* Favicon */}
+      <link rel="icon" type="image/png" href={brand.favicon} />
+      <link rel="shortcut icon" type="image/png" href={brand.favicon} />
+      <link rel="apple-touch-icon" href={brand.favicon} />
+      
       {/* Título */}
       <title>{brand.name} - Consulta CNPJ e CNAE Gratuita</title>
       
