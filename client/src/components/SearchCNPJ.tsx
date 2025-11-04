@@ -43,24 +43,24 @@ export function SearchCNPJ({ onSearch, onResult, isLoading }: SearchCNPJProps) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+      <div className="text-center mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2 sm:mb-3 md:mb-4">
           Consulta CNPJ
         </h1>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 text-sm sm:text-base md:text-lg px-2">
           Consulte dados de empresas brasileiras de forma rápida e gratuita
         </p>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 p-4 sm:p-6 md:p-8">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
           <div>
-            <label htmlFor="cnpj" className="block text-lg font-semibold text-gray-900 mb-3">
+            <label htmlFor="cnpj" className="block text-sm sm:text-base md:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
               Digite o CNPJ
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -71,7 +71,7 @@ export function SearchCNPJ({ onSearch, onResult, isLoading }: SearchCNPJProps) {
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
                 placeholder="00.000.000/0000-00"
-                className="w-full pl-12 pr-4 py-4 text-lg rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-base sm:text-lg rounded-xl sm:rounded-2xl border-2 border-gray-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
                 disabled={isLoading}
               />
             </div>
@@ -88,16 +88,16 @@ export function SearchCNPJ({ onSearch, onResult, isLoading }: SearchCNPJProps) {
           <button
             type="submit"
             disabled={isLoading || !cnpj.trim()}
-            className="w-full rounded-2xl px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-base sm:text-lg font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             {isLoading ? (
               <div className="flex items-center justify-center space-x-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 <span>Consultando...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center space-x-2">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <span>Consultar CNPJ</span>
@@ -106,8 +106,8 @@ export function SearchCNPJ({ onSearch, onResult, isLoading }: SearchCNPJProps) {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="mt-4 sm:mt-5 md:mt-6 text-center px-2">
+          <p className="text-xs sm:text-sm text-gray-500">
             💡 Dica: Digite apenas os números ou use a formatação automática
           </p>
         </div>
