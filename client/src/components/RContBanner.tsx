@@ -1,9 +1,9 @@
 import React from 'react';
 import { getBrandConfig } from '../config/brand';
 
-const brand = getBrandConfig();
-
 export function RContBanner() {
+  const brand = getBrandConfig();
+  
   return (
     <a 
       href={brand.website} 

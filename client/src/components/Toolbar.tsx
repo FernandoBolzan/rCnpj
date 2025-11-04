@@ -9,14 +9,13 @@ interface ToolbarProps {
   onShowHistory: () => void;
 }
 
-const brand = getBrandConfig();
-
 export function Toolbar({
   isOffline,
   favoritesCount,
   onShowFavorites,
   onShowHistory
 }: ToolbarProps) {
+  const brand = getBrandConfig();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
