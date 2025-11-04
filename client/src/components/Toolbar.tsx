@@ -32,9 +32,7 @@ export function Toolbar({
         {/* Logo e Status */}
         <div className="flex items-center space-x-3 sm:space-x-4">
           <a 
-            href={brand.website} 
-            target="_blank" 
-            rel="noopener noreferrer"
+            href={brand.website}
             className="hover:opacity-80 transition-opacity"
             title={`Ir para ${brand.name}`}
           >
