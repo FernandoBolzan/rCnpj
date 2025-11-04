@@ -11,6 +11,7 @@ import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { SEO } from './components/SEO';
 import { BrandHead } from './components/BrandHead';
+import { Footer } from './components/Footer';
 import { api } from './lib/api';
 import { storage } from './lib/storage';
 import { 
@@ -376,7 +377,7 @@ function App() {
   const favoritesCount = favorites.cnpj.length + favorites.cnae.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <BrandHead />
       
       <Toolbar
@@ -386,7 +387,8 @@ function App() {
         onShowHistory={() => setShowHistory(true)}
       />
       
-      <Routes>
+      <div className="flex-1">
+        <Routes>
         <Route path="/" element={
           <>
             <SEO
@@ -565,7 +567,10 @@ function App() {
              </div>
            </>
          } />
-      </Routes>
+        </Routes>
+      </div>
+      
+      <Footer />
       
       <FavoritesDrawer
         isOpen={showFavorites}
