@@ -1,6 +1,11 @@
+# IMPORTANTE: Configure o build command no painel do Netlify:
+# Para RCont: cd client && npm install && npm run build:rcont
+# Para Sistematizo: cd client && npm install && npm run build:sistematizo
+
 [build]
   publish = "client/dist"
-  command = "cd client && npm install && npm run build"
+  # NÃO use "npm run build" genérico - configure no painel!
+  # command = "cd client && npm install && npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
