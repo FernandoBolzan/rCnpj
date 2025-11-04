@@ -32,49 +32,50 @@ export function CNAEHierarchy({ classe, subclasse, onClose, onSaveFavorite, isFa
     ];
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl max-w-full sm:max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="p-3 sm:p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 truncate">
                 Hierarquia CNAE
               </h2>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                aria-label="Fechar"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
           </div>
           
-          <div className="p-6 overflow-y-auto max-h-[60vh]">
-            <div className="space-y-4">
+          <div className="p-3 sm:p-4 md:p-6 overflow-y-auto flex-1">
+            <div className="space-y-3 sm:space-y-4">
               {hierarchy.map((item, index) => (
-                <div key={index} className="flex items-start space-x-4">
+                <div key={index} className="flex items-start space-x-2 sm:space-x-3 md:space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 text-sm font-medium">
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 text-xs sm:text-sm font-medium">
                         {index + 1}
                       </span>
                     </div>
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                      <span className="text-xs sm:text-sm font-medium text-gray-500 bg-gray-100 px-2 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
                         {item.level}
                       </span>
                       {item.id && (
-                        <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        <span className="text-xs sm:text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 sm:py-1 rounded-full whitespace-nowrap">
                           {formatCNAE(item.id)}
                         </span>
                       )}
                     </div>
                     
-                    <p className="text-gray-900 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-900 leading-relaxed break-words">
                       {item.descricao}
                     </p>
                   </div>
