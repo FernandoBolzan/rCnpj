@@ -31,11 +31,19 @@ export function Toolbar({
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         {/* Logo e Status */}
         <div className="flex items-center space-x-3 sm:space-x-4">
-          <img 
-            src={brand.logo} 
-            alt={`${brand.name} Logo`} 
-            className="h-8 sm:h-10 w-auto object-contain"
-          />
+          <a 
+            href={brand.website} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+            title={`Ir para ${brand.name}`}
+          >
+            <img 
+              src={brand.logo} 
+              alt={`${brand.name} Logo`} 
+              className="h-8 sm:h-10 w-auto object-contain cursor-pointer"
+            />
+          </a>
           
           <div className="flex items-center space-x-2">
             <div className={`w-2 h-2 rounded-full ${isOffline ? 'bg-red-500' : 'bg-green-500'}`} />
